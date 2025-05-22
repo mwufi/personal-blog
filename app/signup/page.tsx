@@ -2,10 +2,11 @@ import Link from 'next/link'
 import { SignupForm } from './client-form'
 
 interface SignupPageProps {
-    searchParams: { message?: string }
+    searchParams: Promise<{ message?: string }>
 }
 
-export default function SignupPage({ searchParams }: SignupPageProps) {
+export default async function SignupPage(props: SignupPageProps) {
+    const searchParams = await props.searchParams;
     const message = searchParams.message
 
     return (

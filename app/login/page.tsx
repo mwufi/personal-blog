@@ -1,12 +1,9 @@
 import Link from 'next/link'
 import { login } from './actions'
 
-interface LoginPageProps {
-    searchParams: { message?: string }
-}
 
-export default function LoginPage({ searchParams }: LoginPageProps) {
-    const message = searchParams.message
+export default async function LoginPage({ searchParams }) {
+    const { message } = await searchParams
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">

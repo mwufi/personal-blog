@@ -2,12 +2,8 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
-interface ErrorPageProps {
-    searchParams: { message?: string }
-}
-
-export default function ErrorPage({ searchParams }: ErrorPageProps) {
-    const errorMessage = searchParams.message
+export default async function ErrorPage({ searchParams }) {
+    const { message: errorMessage } = await searchParams
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">

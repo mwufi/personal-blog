@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mail } from 'lucide-react'
 
 interface SignupSuccessProps {
-    searchParams: { email?: string }
+    searchParams: Promise<{ email?: string }>
 }
 
-export default function SignupSuccessPage({ searchParams }: SignupSuccessProps) {
+export default async function SignupSuccessPage(props: SignupSuccessProps) {
+    const searchParams = await props.searchParams;
     const email = searchParams.email
 
     return (

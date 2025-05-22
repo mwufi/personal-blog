@@ -145,4 +145,5 @@ async function main() {
 main().catch((error) => {
     console.error('💥 Script failed:', error)
     process.stdin.destroy()
-    process.exit(1) 
+    process.exit(1)
+})
