@@ -8,7 +8,7 @@ export function PhotoGallery({ images }: PhotoGalleryProps) {
     const rotations = ['rotate-2', '-rotate-2', 'rotate-2', 'rotate-2', '-rotate-2']
 
     return (
-        <div className="mt-16 sm:mt-20">
+        <div className="mt-12 sm:mt-16 relative z-10">
             <div className="-my-4 flex justify-center gap-5 overflow-hidden py-4 sm:gap-8">
                 {images.slice(0, 5).map((src, index) => (
                     <div

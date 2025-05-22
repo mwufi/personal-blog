@@ -22,18 +22,6 @@ export function Footer() {
                                         >
                                             Projects
                                         </Link>
-                                        <Link
-                                            href="/speaking"
-                                            className="transition hover:text-teal-500 dark:hover:text-teal-400"
-                                        >
-                                            Speaking
-                                        </Link>
-                                        <Link
-                                            href="/uses"
-                                            className="transition hover:text-teal-500 dark:hover:text-teal-400"
-                                        >
-                                            Uses
-                                        </Link>
                                     </div>
                                     <p className="text-sm text-zinc-400 dark:text-zinc-500">
                                         © {new Date().getFullYear()} Zen Tomorrow. All rights reserved.
