@@ -66,12 +66,13 @@ export default function Page() {
           <div className="relative px-4 sm:px-8 lg:px-12">
             <div className="mx-auto max-w-2xl lg:max-w-5xl">
               <div className="max-w-2xl">
-                <h1 className="text-4xl font-bold tracking-tight text-zinc-800 sm:text-5xl dark:text-zinc-100">
-                  Software engineer, philosopher, and mindful creator.
+                <h1 className="text-4xl font-bold tracking-tight text-zinc-800 font-caveat sm:text-5xl dark:text-zinc-100">
+                  Welcome to Zen Tomorrow
                 </h1>
                 <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-                  I'm Zen, a software engineer passionate about AI, mindfulness, and the intersection of technology and philosophy.
-                  Based in the digital realm, I build things that matter and explore the deeper questions of existence.
+                  {`This is my personal website. `}
+                  {`I'm a software engineer passionate about AI, mindfulness, and the intersection of technology and philosophy. `}
+                  {`Based in the digital realm, I build things that matter and explore the deeper questions of existence.`}
                 </p>
 
                 {/* Social Links */}
