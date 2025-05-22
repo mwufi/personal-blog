@@ -17,7 +17,7 @@ function ArrowIcon() {
 
 export default function Footer() {
   return (
-    <footer className="mb-16">
+    <footer className="mb-16 mt-auto">
       <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
         <li>
           <a
@@ -31,7 +31,7 @@ export default function Footer() {
           </a>
         </li>
       </ul>
-      <p className="mt-8 text-neutral-600 dark:text-neutral-300">
+      <p className="mt-4 text-neutral-600 dark:text-neutral-300">
         {`Come say hi to me on Twitter: `} <a href="https://x.com/maximumagi" target="_blank" rel="noopener noreferrer">Zen</a>
       </p>
     </footer>
