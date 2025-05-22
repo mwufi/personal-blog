@@ -8,6 +8,8 @@
   "dependencies": {
     "@instantdb/react": "^0.19.8",
     "@radix-ui/react-slot": "^1.2.3",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.8",
     "@tailwindcss/postcss": "^4.1.7",
     "@types/node": "20.11.17",
     "@types/react": "19.1.5",

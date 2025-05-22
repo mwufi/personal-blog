@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import './global.css'
 import { baseUrl } from './sitemap'
+import { AuthWrapper } from '@/components/auth/auth-wrapper'
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -36,7 +37,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="antialiased">
-      <body>{children}</body>
+      <body>
+        <AuthWrapper>
+          {children}
+        </AuthWrapper>
+      </body>
     </html>
   )
 }
