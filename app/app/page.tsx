@@ -1,46 +1,97 @@
+'use client'
+
 import { FileUpload } from '@/components/FileUpload'
 import { DocumentGrid } from '@/components/DocumentGrid'
 import { QuickStats } from '@/components/QuickStats'
+import { useQuery, useAuth } from '@/lib/instant'
+import { useAuthSync } from '@/lib/auth-sync'
 
-// Mock data - this will be replaced with real data later
-const mockDocuments = [
-    {
-        id: '1',
-        name: 'Product Requirements Document.pdf',
-        type: 'pdf',
-        size: 2456789,
-        uploadedAt: new Date('2024-01-15'),
-        status: 'ready' as const,
-        chunkCount: 45
-    },
-    {
-        id: '2',
-        name: 'Meeting Notes Q1 2024.docx',
-        type: 'docx',
-        size: 876543,
-        uploadedAt: new Date('2024-01-10'),
-        status: 'ready' as const,
-        chunkCount: 23
-    },
-    {
-        id: '3',
-        name: 'Research Paper Draft.pdf',
-        type: 'pdf',
-        size: 3234567,
-        uploadedAt: new Date('2024-01-08'),
-        status: 'processing' as const,
-        chunkCount: 0
+function AppContent() {
+    const { user: supabaseUser, loading: authLoading } = useAuthSync()
+    const { user: instantUser } = useAuth()
+
+    // Query user's documents using InstantDB user
+    const { data, isLoading, error } = useQuery({
+        documents: {
+            $: {
+                where: instantUser?.email ? { userId: supabaseUser?.id || 'none' } : { userId: 'none' },
+                order: { uploadedAt: 'desc' }
+            }
+        }
+    })
+
+    const documents = data?.documents || []
+
+    // Calculate stats from real data
+    const stats = {
+        totalDocuments: documents.length,
+        totalChats: 0, // TODO: Calculate from chat sessions
+        storageUsed: documents.reduce((acc, doc) => acc + (doc.size || 0), 0),
+        lastActive: documents.length > 0 ? new Date(Math.max(...documents.map(d => d.uploadedAt || 0))) : new Date()
     }
-]
 
-const mockStats = {
-    totalDocuments: 12,
-    totalChats: 8,
-    storageUsed: '248 MB',
-    lastActive: new Date('2024-01-15')
-}
+    const formatBytes = (bytes: number) => {
+        if (bytes === 0) return '0 B'
+        const k = 1024
+        const sizes = ['B', 'KB', 'MB', 'GB']
+        const i = Math.floor(Math.log(bytes) / Math.log(k))
+        return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
+    }
 
-export default function AppPage() {
+    const statsFormatted = {
+        ...stats,
+        storageUsed: formatBytes(stats.storageUsed)
+    }
+
+    // Transform documents to match the expected interface
+    const transformedDocuments = documents.map(doc => ({
+        id: doc.id,
+        name: doc.name || 'Untitled',
+        type: doc.type || 'unknown',
+        size: doc.size || 0,
+        uploadedAt: new Date(doc.uploadedAt || Date.now()),
+        status: doc.status as 'uploading' | 'processing' | 'ready' | 'error',
+        chunkCount: doc.chunkCount || 0
+    }))
+
+    if (!supabaseUser) {
+        return (
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center py-12">
+                    <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                        Please log in to access your documents
+                    </h2>
+                    <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+                        You need to be authenticated to upload and manage documents.
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
+    if (authLoading || isLoading) {
+        return (
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500 mx-auto"></div>
+                    <p className="mt-4 text-zinc-600 dark:text-zinc-400">
+                        {authLoading ? 'Loading...' : 'Loading your documents...'}
+                    </p>
+                </div>
+            </div>
+        )
+    }
+
+    if (error) {
+        return (
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+                <div className="text-center py-12">
+                    <p className="text-red-600 dark:text-red-400">Error loading documents: {error.message}</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
             {/* Page Header */}
@@ -55,7 +106,7 @@ export default function AppPage() {
 
             {/* Quick Stats */}
             <div className="mb-8">
-                <QuickStats stats={mockStats} />
+                <QuickStats stats={statsFormatted} />
             </div>
 
             {/* File Upload Section */}
@@ -69,7 +120,9 @@ export default function AppPage() {
                             Drag and drop files or click to browse. Supports PDF, DOCX, and TXT files.
                         </p>
                     </div>
-                    <FileUpload />
+                    <FileUpload onFileUpload={() => {
+                        // Files will be automatically refetched via InstantDB reactivity
+                    }} />
                 </div>
             </div>
 
@@ -90,11 +143,11 @@ export default function AppPage() {
                     </div>
                 </div>
 
-                <DocumentGrid documents={mockDocuments} />
+                <DocumentGrid documents={transformedDocuments} />
             </div>
 
             {/* Empty State (when no documents) */}
-            {mockDocuments.length === 0 && (
+            {transformedDocuments.length === 0 && (
                 <div className="text-center py-12">
                     <div className="mx-auto h-12 w-12 text-zinc-400">
                         <svg
@@ -121,4 +174,8 @@ export default function AppPage() {
             )}
         </div>
     )
+}
+
+export default function AppPage() {
+    return <AppContent />
 } 

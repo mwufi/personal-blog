@@ -1,4 +1,9 @@
+'use client'
+
 import Link from 'next/link'
+import { useState } from 'react'
+import { DocumentViewer } from '@/components/DocumentViewer'
+import { useQuery, useAuth } from '@/lib/instant'
 
 interface Document {
     id: string
@@ -15,6 +20,17 @@ interface DocumentGridProps {
 }
 
 export function DocumentGrid({ documents }: DocumentGridProps) {
+    const [selectedDocument, setSelectedDocument] = useState<string | null>(null)
+
+    // Get document details for viewer
+    const { data: documentData } = useQuery({
+        documents: selectedDocument ? {
+            $: { where: { id: selectedDocument } }
+        } : undefined
+    })
+
+    const viewerDocument = documentData?.documents?.[0]
+
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return '0 Bytes'
         const k = 1024
@@ -122,7 +138,10 @@ export function DocumentGrid({ documents }: DocumentGridProps) {
                                         Chat
                                     </Link>
                                 )}
-                                <button className="text-xs font-medium text-zinc-600 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300">
+                                <button
+                                    onClick={() => setSelectedDocument(document.id)}
+                                    className="text-xs font-medium text-zinc-600 hover:text-zinc-500 dark:text-zinc-400 dark:hover:text-zinc-300"
+                                >
                                     View
                                 </button>
                             </div>
@@ -152,6 +171,20 @@ export function DocumentGrid({ documents }: DocumentGridProps) {
                     </div>
                 </article>
             ))}
+
+            {/* Document Viewer Modal */}
+            {selectedDocument && viewerDocument && (
+                <DocumentViewer
+                    document={{
+                        id: viewerDocument.id,
+                        name: viewerDocument.name || 'Untitled',
+                        type: viewerDocument.type || 'unknown',
+                        supabaseUrl: viewerDocument.supabaseUrl || '',
+                        storagePath: viewerDocument.storagePath || ''
+                    }}
+                    onClose={() => setSelectedDocument(null)}
+                />
+            )}
         </div>
     )
 } 

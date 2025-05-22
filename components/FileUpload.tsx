@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
+import { useAuthSync } from '@/lib/auth-sync'
 
 interface FileUploadProps {
     onFileUpload?: (files: File[]) => void
@@ -17,6 +18,10 @@ export function FileUpload({
     const [isDragOver, setIsDragOver] = useState(false)
     const [isUploading, setIsUploading] = useState(false)
     const [uploadedFiles, setUploadedFiles] = useState<string[]>([])
+    const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
+    const [error, setError] = useState<string | null>(null)
+
+    const { user } = useAuthSync()
 
     const formatFileSize = (bytes: number) => {
         if (bytes === 0) return '0 Bytes'
@@ -27,7 +32,13 @@ export function FileUpload({
     }
 
     const handleFiles = useCallback(async (files: FileList | File[]) => {
+        if (!user?.id) {
+            setError('You must be logged in to upload files')
+            return
+        }
+
         const fileArray = Array.from(files)
+        setError(null)
 
         // Validate files
         const validFiles = fileArray.filter(file => {
@@ -37,11 +48,11 @@ export function FileUpload({
             const isValidSize = file.size <= maxSize
 
             if (!isValidType) {
-                console.warn(`File ${file.name} has invalid type`)
+                setError(`File ${file.name} has invalid type. Supported: ${acceptedTypes.join(', ')}`)
                 return false
             }
             if (!isValidSize) {
-                console.warn(`File ${file.name} is too large`)
+                setError(`File ${file.name} is too large. Max size: ${formatFileSize(maxSize)}`)
                 return false
             }
             return true
@@ -51,23 +62,50 @@ export function FileUpload({
 
         setIsUploading(true)
 
-        // Simulate upload process
         try {
-            // Mock upload delay
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            // Upload files one by one
+            for (const file of validFiles) {
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('userId', user.id)
 
-            const newFileNames = validFiles.map(file => file.name)
-            setUploadedFiles(prev => [...prev, ...newFileNames])
+                setUploadProgress(prev => ({ ...prev, [file.name]: 0 }))
+
+                const response = await fetch('/api/documents/upload', {
+                    method: 'POST',
+                    body: formData,
+                })
+
+                if (!response.ok) {
+                    const errorData = await response.json()
+                    throw new Error(errorData.error || 'Upload failed')
+                }
+
+                const result = await response.json()
+
+                setUploadProgress(prev => ({ ...prev, [file.name]: 100 }))
+                setUploadedFiles(prev => [...prev, file.name])
+
+                // Simulate processing delay for UI feedback
+                setTimeout(() => {
+                    setUploadProgress(prev => {
+                        const newProgress = { ...prev }
+                        delete newProgress[file.name]
+                        return newProgress
+                    })
+                }, 2000)
+            }
 
             // Call the callback if provided
             onFileUpload?.(validFiles)
 
         } catch (error) {
             console.error('Upload failed:', error)
+            setError(error instanceof Error ? error.message : 'Upload failed')
         } finally {
             setIsUploading(false)
         }
-    }, [acceptedTypes, maxSize, onFileUpload])
+    }, [acceptedTypes, maxSize, onFileUpload, user?.id])
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault()
@@ -103,8 +141,8 @@ export function FileUpload({
             {/* Upload Area */}
             <div
                 className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${isDragOver
-                        ? 'border-teal-400 bg-teal-50 dark:border-teal-500 dark:bg-teal-950/20'
-                        : 'border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500'
+                    ? 'border-teal-400 bg-teal-50 dark:border-teal-500 dark:bg-teal-950/20'
+                    : 'border-zinc-300 dark:border-zinc-600 hover:border-zinc-400 dark:hover:border-zinc-500'
                     }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -156,6 +194,45 @@ export function FileUpload({
                     )}
                 </div>
             </div>
+
+            {/* Error Display */}
+            {error && (
+                <div className="rounded-md bg-red-50 p-4 dark:bg-red-900/20">
+                    <div className="flex">
+                        <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="ml-3">
+                            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Upload Progress */}
+            {Object.keys(uploadProgress).length > 0 && (
+                <div className="space-y-3">
+                    <h4 className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                        Uploading...
+                    </h4>
+                    {Object.entries(uploadProgress).map(([fileName, progress]) => (
+                        <div key={fileName} className="space-y-1">
+                            <div className="flex justify-between text-sm">
+                                <span className="text-zinc-600 dark:text-zinc-400">{fileName}</span>
+                                <span className="text-zinc-500 dark:text-zinc-500">{progress}%</span>
+                            </div>
+                            <div className="w-full bg-zinc-200 rounded-full h-2 dark:bg-zinc-700">
+                                <div
+                                    className="bg-teal-500 h-2 rounded-full transition-all duration-300"
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
 
             {/* Recently Uploaded */}
             {uploadedFiles.length > 0 && (

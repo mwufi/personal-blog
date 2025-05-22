@@ -1,8 +1,21 @@
-import { init, id } from '@instantdb/react';
+import { init } from '@instantdb/react'
+import schema, { type AppSchema } from '../instant.schema'
 
-// ID for app: personalsite
-const APP_ID = 'b8e2308a-e3b8-4c9b-8ab7-282d23bba847';
+// Initialize InstantDB
+const instantDb = init<AppSchema>({
+    appId: process.env.NEXT_PUBLIC_INSTANT_APP_ID!
+})
 
-const db = init({ appId: APP_ID });
+// Export typed hooks
+export const {
+    useQuery,
+    transact,
+    tx,
+    useAuth
+} = instantDb
 
-export { db, id }
+// Export the db instance for auth operations
+export const db = instantDb
+
+// Export types
+export type { Document, Collection, Note, ChatSession, ChatMessage } from '../instant.schema'
