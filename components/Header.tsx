@@ -105,18 +105,10 @@ export function Header() {
                                                 </li>
                                                 <li>
                                                     <Link
-                                                        href="/speaking"
+                                                        href="/app"
                                                         className="relative block px-3 py-2 transition hover:text-teal-500 dark:hover:text-teal-400"
                                                     >
-                                                        Speaking
-                                                    </Link>
-                                                </li>
-                                                <li>
-                                                    <Link
-                                                        href="/uses"
-                                                        className="relative block px-3 py-2 transition hover:text-teal-500 dark:hover:text-teal-400"
-                                                    >
-                                                        Uses
+                                                        App
                                                     </Link>
                                                 </li>
                                             </ul>
