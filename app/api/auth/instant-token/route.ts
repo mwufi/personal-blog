@@ -3,9 +3,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 // Initialize InstantDB Admin
+// Make sure we have the required environment variables
+if (!process.env.INSTANT_APP_ID) {
+    throw new Error('INSTANT_APP_ID environment variable is required')
+}
+if (!process.env.INSTANT_ADMIN_TOKEN) {
+    throw new Error('INSTANT_ADMIN_TOKEN environment variable is required')
+}
+
 const db = init({
-    appId: process.env.INSTANT_APP_ID!,
-    adminToken: process.env.INSTANT_ADMIN_TOKEN!
+    appId: process.env.INSTANT_APP_ID,
+    adminToken: process.env.INSTANT_ADMIN_TOKEN
 })
 
 // Initialize Supabase Admin Client
@@ -16,6 +24,9 @@ const supabase = createClient(
 
 export async function POST(request: NextRequest) {
     try {
+        console.log('InstantDB Admin Token exists:', !!process.env.INSTANT_ADMIN_TOKEN)
+        console.log('InstantDB App ID:', process.env.INSTANT_APP_ID)
+
         const { supabaseToken } = await request.json()
 
         if (!supabaseToken) {
@@ -36,6 +47,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Create InstantDB token for this user
+        console.log('Creating token for user:', user.email)
         const instantToken = await db.auth.createToken(user.email!)
 
         return NextResponse.json({

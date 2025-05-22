@@ -20,7 +20,7 @@ const _schema = i.schema({
       supabaseUrl: i.string(),
       storagePath: i.string(),
       status: i.string(), // 'uploading', 'processing', 'ready', 'error'
-      uploadedAt: i.number(),
+      uploadedAt: i.number().indexed(),
       chunkCount: i.number().optional(),
       metadata: i.any().optional(), // { pages, wordCount, topics, etc }
       tags: i.any().optional(),
