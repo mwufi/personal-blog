@@ -1,4 +1,4 @@
-import { getBlogPosts } from 'app/blog/utils'
+import { getBlogPosts } from 'app/(classic layout)/blog/utils'
 import { Post } from './Post'
 
 export function BlogPosts() {

@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { formatDate } from '../blog/formatDate'
+import { formatDate } from '../(classic layout)/blog/formatDate'
 
 export function Post({ post }) {
     return (
