@@ -1,4 +1,5 @@
-import { login, signup } from './actions'
+import Link from 'next/link'
+import { login } from './actions'
 
 interface LoginPageProps {
     searchParams: { message?: string }
@@ -15,15 +16,15 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                         Sign in to your account
                     </h2>
                     <p className="mt-2 text-center text-sm text-muted-foreground">
-                        Or{' '}
-                        <span className="font-medium text-primary">
-                            sign up for a new account below
-                        </span>
+                        Don't have an account?{' '}
+                        <Link href="/signup" className="font-medium text-primary hover:text-primary/80">
+                            Sign up here
+                        </Link>
                     </p>
                     {message && (
                         <div className={`mt-4 p-4 text-sm text-center rounded-md border ${message.includes('⚠️')
-                                ? 'bg-amber-50 text-amber-800 border-amber-200'
-                                : 'bg-blue-50 text-blue-800 border-blue-200'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : 'bg-blue-50 text-blue-800 border-blue-200'
                             }`}>
                             <div className="font-medium">{message}</div>
                         </div>
@@ -40,7 +41,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                                 id="email"
                                 name="email"
                                 type="email"
-                                autoComplete="email"
+                                autoComplete="off"
                                 required
                                 className="relative block w-full rounded-md border border-input bg-background px-3 py-2 placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                                 placeholder="Email address"
@@ -54,7 +55,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                                 id="password"
                                 name="password"
                                 type="password"
-                                autoComplete="current-password"
+                                autoComplete="off"
                                 required
                                 className="relative block w-full rounded-md border border-input bg-background px-3 py-2 placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                                 placeholder="Password"
@@ -62,18 +63,12 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
                         </div>
                     </div>
 
-                    <div className="flex space-x-4">
+                    <div>
                         <button
                             formAction={login}
                             className="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                             Sign in
-                        </button>
-                        <button
-                            formAction={signup}
-                            className="group relative flex w-full justify-center rounded-md border border-input bg-background px-3 py-2 text-sm font-semibold text-foreground hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                        >
-                            Sign up
                         </button>
                     </div>
                 </form>
