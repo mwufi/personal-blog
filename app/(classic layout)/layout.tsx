@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { Caveat_Brush } from 'next/font/google'
 import { GeistMono } from 'geist/font/mono'
-import { Navbar } from '../components/nav'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import Footer from '../components/footer'
-
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 
 const caveatBrush = Caveat_Brush({
   subsets: ['latin'],
@@ -14,7 +13,7 @@ const caveatBrush = Caveat_Brush({
   variable: '--font-caveat-brush',
 })
 
-const cx = (...classes) => classes.filter(Boolean).join(' ')
+const cx = (...classes: (string | undefined)[]) => classes.filter(Boolean).join(' ')
 
 export default function RootLayout({
   children,
@@ -25,20 +24,28 @@ export default function RootLayout({
     <html
       lang="en"
       className={cx(
-        'text-black bg-white dark:text-white dark:bg-black h-full',
-        // GeistSans.variable,
-        // GeistMono.variable,
+        'h-full',
         caveatBrush.variable
       )}
     >
-      <body className="antialiased max-w-xl mx-4 mt-8 lg:mx-auto h-full">
-        <main className="flex-auto min-w-0 mt-6 flex flex-col px-2 md:px-0 h-full">
-          <Navbar />
-          {children}
-          <Footer />
-          <Analytics />
-          <SpeedInsights />
-        </main>
+      <body className="flex h-full bg-zinc-50 dark:bg-black">
+        <div className="flex w-full">
+          <div className="fixed inset-0 flex justify-center sm:px-8">
+            <div className="flex w-full max-w-7xl lg:px-8">
+              <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20"></div>
+            </div>
+          </div>
+          <div className="relative flex w-full flex-col">
+            <Header />
+            <div className="flex-none" style={{ height: 'var(--content-offset)' }}></div>
+            <main className="flex-auto">
+              {children}
+            </main>
+            <Footer />
+            <Analytics />
+            <SpeedInsights />
+          </div>
+        </div>
       </body>
     </html>
   )

@@ -4,8 +4,22 @@
 @custom-variant dark (&:is(.dark *));
 
 ::selection {
-  background-color: #47a3f3;
+  background-color: #14b8a6;
   color: #fefefe;
+}
+
+/* Custom CSS variables for header animations */
+:root {
+  --header-height: theme(spacing.16);
+  --header-mb: theme(spacing.8);
+  --header-top: theme(spacing.6);
+  --header-position: sticky;
+  --header-inner-position: relative;
+  --avatar-top: theme(spacing.3);
+  --avatar-border-opacity: 0;
+  --avatar-border-transform: scale(1);
+  --avatar-image-transform: scale(1);
+  --content-offset: 0px;
 }
 
 .font-caveat {
@@ -119,27 +133,31 @@ html {
 
 .prose img {
   /* Don't apply styles to next/image */
-  @apply m-0;
+  @apply m-0 rounded-lg;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-zinc-200 dark:border-zinc-700 pl-4 italic text-zinc-600 dark:text-zinc-400;
 }
 
 .prose p {
-  @apply my-4 text-neutral-800 dark:text-neutral-200;
+  @apply my-4 text-zinc-600 dark:text-zinc-400;
 }
 
 .prose h1 {
-  @apply text-4xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-4xl font-bold tracking-tight mt-6 mb-4 text-zinc-800 dark:text-zinc-100;
 }
 
 .prose h2 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-2xl font-semibold tracking-tight mt-8 mb-4 text-zinc-800 dark:text-zinc-100;
 }
 
 .prose h3 {
-  @apply text-xl font-medium tracking-tight mt-6 mb-2;
+  @apply text-xl font-semibold tracking-tight mt-6 mb-3 text-zinc-800 dark:text-zinc-100;
 }
 
 .prose h4 {
-  @apply text-lg font-medium tracking-tight mt-6 mb-2;
+  @apply text-lg font-medium tracking-tight mt-6 mb-2 text-zinc-800 dark:text-zinc-100;
 }
 
 .prose strong {
