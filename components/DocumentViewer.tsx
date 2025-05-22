@@ -14,7 +14,7 @@ interface DocumentViewerProps {
     onClose: () => void
 }
 
-export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
+export function DocumentViewer({ document: file, onClose }: DocumentViewerProps) {
     const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [content, setContent] = useState<string | null>(null)
@@ -27,12 +27,12 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
             setError(null)
 
             try {
-                if (document.type.toLowerCase() === 'pdf') {
+                if (file.type.toLowerCase() === 'pdf') {
                     // For PDFs, we'll show them in an iframe
-                    setContent(document.supabaseUrl)
-                } else if (document.type.toLowerCase() === 'txt') {
+                    setContent(file.supabaseUrl)
+                } else if (file.type.toLowerCase() === 'txt') {
                     // For text files, fetch and display content
-                    const response = await fetch(document.supabaseUrl)
+                    const response = await fetch(file.supabaseUrl)
                     if (!response.ok) throw new Error('Failed to fetch document')
                     const text = await response.text()
                     setContent(text)
@@ -49,26 +49,27 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
         }
 
         loadDocument()
-    }, [document])
+    }, [file])
 
     const handleDownload = () => {
         const link = document.createElement('a')
-        link.href = document.supabaseUrl
-        link.download = document.name
+        link.href = file.supabaseUrl
+        link.target = '_blank'
+        link.rel = 'noopener noreferrer'
         link.click()
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-            <div className="w-full max-w-4xl max-h-[90vh] bg-white dark:bg-zinc-800 rounded-lg shadow-xl flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-2 sm:p-4">
+            <div className="w-full max-w-7xl h-[95vh] bg-white dark:bg-zinc-800 rounded-lg shadow-2xl flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-700">
                     <div>
                         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                            {document.name}
+                            {file.name}
                         </h2>
                         <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                            {document.type.toUpperCase()} Document
+                            {file.type.toUpperCase()} Document
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -76,7 +77,7 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
                             onClick={handleDownload}
                             className="px-3 py-1 text-sm bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
                         >
-                            Download
+                            Open in New Tab
                         </button>
                         <button
                             onClick={onClose}
@@ -111,7 +112,7 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
                                     onClick={handleDownload}
                                     className="mt-4 px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
                                 >
-                                    Download Instead
+                                    Open in New Tab
                                 </button>
                             </div>
                         </div>
@@ -119,15 +120,16 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
 
                     {!isLoading && !error && (
                         <>
-                            {document.type.toLowerCase() === 'pdf' && content && (
+                            {file.type.toLowerCase() === 'pdf' && content && (
                                 <iframe
                                     src={content}
-                                    className="w-full h-full min-h-[500px]"
-                                    title={document.name}
+                                    className="w-full h-full min-h-[600px]"
+                                    title={file.name}
+                                    style={{ height: 'calc(95vh - 100px)' }}
                                 />
                             )}
 
-                            {document.type.toLowerCase() === 'txt' && content && (
+                            {file.type.toLowerCase() === 'txt' && content && (
                                 <div className="p-6">
                                     <pre className="whitespace-pre-wrap text-sm text-zinc-900 dark:text-zinc-100 font-mono">
                                         {content}
@@ -135,7 +137,7 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
                                 </div>
                             )}
 
-                            {!['pdf', 'txt'].includes(document.type.toLowerCase()) && (
+                            {!['pdf', 'txt'].includes(file.type.toLowerCase()) && (
                                 <div className="flex items-center justify-center h-64">
                                     <div className="text-center">
                                         <svg className="w-16 h-16 text-zinc-400 mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -151,7 +153,7 @@ export function DocumentViewer({ document, onClose }: DocumentViewerProps) {
                                             onClick={handleDownload}
                                             className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
                                         >
-                                            Download to View
+                                            Open in New Tab
                                         </button>
                                     </div>
                                 </div>
