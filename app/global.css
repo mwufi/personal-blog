@@ -5,6 +5,10 @@
   color: #fefefe;
 }
 
+.font-caveat {
+  font-family: "Caveat Brush", "sans-serif";
+}
+
 :root {
   --sh-class: #2d5e9d;
   --sh-identifier: #354150;
