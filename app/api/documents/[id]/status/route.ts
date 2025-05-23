@@ -9,11 +9,11 @@ const db = init({
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
         const { status, chunkCount } = await request.json()
-        const documentId = params.id
+        const { id: documentId } = await context.params
 
         if (!status || !['uploading', 'processing', 'ready', 'error'].includes(status)) {
             return NextResponse.json(
